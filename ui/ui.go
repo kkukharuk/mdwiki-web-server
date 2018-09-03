@@ -4,13 +4,15 @@ import (
 	"github.com/mister87/mdwiki-web-server/ui/handlers"
 	"github.com/mister87/mdwiki-web-server/ui/static/css"
 	"github.com/mister87/mdwiki-web-server/ui/static/js"
+	"log"
 	"net"
 	"net/http"
 	"time"
 )
 
-func Start(listener net.Listener) {
+func Start(listener net.Listener) *http.Server {
 	server := &http.Server{
+		Addr:           listener.Addr().String(),
 		ReadTimeout:    60 * time.Second,
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 16,
@@ -20,7 +22,7 @@ func Start(listener net.Listener) {
 	http.Handle("/", handlers.Other())
 	http.Handle("/ui", handlers.Index())
 	http.Handle("/login", handlers.Login())
-	// Static Handle
+	// Static Handles
 	http.HandleFunc("/static/css/bootstrap.min.css", css.BootstrapMinCSS)
 	http.HandleFunc("/static/css/ie10-viewport-bug-workaround.css", css.IE10ViewportBugWorkaroundCSS)
 	http.HandleFunc("/static/css/signin.css", css.SigninCSS)
@@ -31,4 +33,11 @@ func Start(listener net.Listener) {
 	http.HandleFunc("/static/js/ie-emulation-modes-warning.js", js.IEEmulationModesWarningJS)
 	http.HandleFunc("/static/js/respond.min.js", js.RespondMinJS)
 	go server.Serve(listener)
+	return server
+}
+
+func Stop(app *http.Server) error {
+	err := app.Shutdown(nil)
+	log.Printf("Stopping, HTTP on: %s\n", app.Addr)
+	return err
 }
