@@ -13,3 +13,9 @@
 
 # Goland project files
 .idea/
+
+# Golang other files
+*.mod
+
+# Temprorary project directory
+temp/
