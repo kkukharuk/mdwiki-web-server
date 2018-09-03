@@ -1,0 +1,15 @@
+package js
+
+import (
+	"encoding/base64"
+	"log"
+	"net/http"
+)
+
+func IE8ResponsiveFileWarningJS(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Getting page: %s", r.URL.Path)
+	js_b64 := "Ly8gTk9USUNFISEgRE8gTk9UIFVTRSBBTlkgT0YgVEhJUyBKQVZBU0NSSVBUCi8vIElUJ1MgSlVTVCBKVU5LIEZPUiBPVVIgRE9DUyEKLy8gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCi8qIQogKiBDb3B5cmlnaHQgMjAxMS0yMDE1IFR3aXR0ZXIsIEluYy4KICoKICogTGljZW5zZWQgdW5kZXIgdGhlIENyZWF0aXZlIENvbW1vbnMgQXR0cmlidXRpb24gMy4wIFVucG9ydGVkIExpY2Vuc2UuIEZvcgogKiBkZXRhaWxzLCBzZWUgaHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LzMuMC8uCiAqLwovLyBJbnRlbmRlZCB0byBwcmV2ZW50IGZhbHNlLXBvc2l0aXZlIGJ1ZyByZXBvcnRzIGFib3V0IHJlc3BvbnNpdmUgc3R5bGluZyBzdXBwb3NlZGx5IG5vdCB3b3JraW5nIGluIElFOC4KaWYgKHdpbmRvdy5sb2NhdGlvbi5wcm90b2NvbCA9PSAnZmlsZTonKSB7CiAgd2luZG93LmFsZXJ0KCdFUlJPUjogQm9vdHN0cmFwXCdzIHJlc3BvbnNpdmUgQ1NTIGlzIGRpc2FibGVkIVxuU2VlIGdldGJvb3RzdHJhcC5jb20vZ2V0dGluZy1zdGFydGVkLyNyZXNwb25kLWZpbGUtcHJvdG8gZm9yIGRldGFpbHMuJykKfQo="
+	js, _ := base64.StdEncoding.DecodeString(js_b64)
+	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	w.Write(js)
+}
