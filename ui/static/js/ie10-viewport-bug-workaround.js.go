@@ -2,12 +2,11 @@ package js
 
 import (
 	"encoding/base64"
-	"log"
 	"net/http"
 )
 
-func IE10ViewportBugWorkaroundJS(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Getting page: %s", r.URL.Path)
+func (cfg *Config) IE10ViewportBugWorkaroundJS(w http.ResponseWriter, r *http.Request) {
+	cfg.Logger.Debugf("Getting page: %s", r.URL.Path)
 	js_b64 := "LyohCiAqIElFMTAgdmlld3BvcnQgaGFjayBmb3IgU3VyZmFjZS9kZXNrdG9wIFdpbmRvd3MgOCBidWcKICogQ29weXJpZ2h0IDIwMTQtMjAxNSBUd2l0dGVyLCBJbmMuCiAqIExpY2Vuc2VkIHVuZGVyIE1JVCAoaHR0cHM6Ly9naXRodWIuY29tL3R3YnMvYm9vdHN0cmFwL2Jsb2IvbWFzdGVyL0xJQ0VOU0UpCiAqLwoKLy8gU2VlIHRoZSBHZXR0aW5nIFN0YXJ0ZWQgZG9jcyBmb3IgbW9yZSBpbmZvcm1hdGlvbjoKLy8gaHR0cDovL2dldGJvb3RzdHJhcC5jb20vZ2V0dGluZy1zdGFydGVkLyNzdXBwb3J0LWllMTAtd2lkdGgKCihmdW5jdGlvbiAoKSB7CiAgJ3VzZSBzdHJpY3QnOwoKICBpZiAobmF2aWdhdG9yLnVzZXJBZ2VudC5tYXRjaCgvSUVNb2JpbGVcLzEwXC4wLykpIHsKICAgIHZhciBtc1ZpZXdwb3J0U3R5bGUgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdzdHlsZScpCiAgICBtc1ZpZXdwb3J0U3R5bGUuYXBwZW5kQ2hpbGQoCiAgICAgIGRvY3VtZW50LmNyZWF0ZVRleHROb2RlKAogICAgICAgICdALW1zLXZpZXdwb3J0e3dpZHRoOmF1dG8haW1wb3J0YW50fScKICAgICAgKQogICAgKQogICAgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignaGVhZCcpLmFwcGVuZENoaWxkKG1zVmlld3BvcnRTdHlsZSkKICB9Cgp9KSgpOwo="
 	js, _ := base64.StdEncoding.DecodeString(js_b64)
 	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
