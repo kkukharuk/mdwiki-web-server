@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/base64"
-	"log"
 	"net/http"
 )
 
@@ -11,7 +10,7 @@ func (cfg *Config) Index() http.Handler {
 }
 
 func (cfg *Config) indexHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Getting page: %s", r.URL.Path)
+	cfg.Logger.Infof("Getting page: %s", r.URL.Path)
 	isAuth, err := r.Cookie("is_auth")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -36,25 +35,25 @@ func (cfg *Config) Other() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		contextPath := r.URL.Path
 		if contextPath == "/" {
-			log.Printf("Getting page: %s", contextPath)
+			cfg.Logger.Infof("Getting page: %s", contextPath)
 			http.Redirect(w, r, "/ui", http.StatusMovedPermanently)
 		} else if contextPath == "/index.md" {
-			log.Printf("Getting page: %s", contextPath)
+			cfg.Logger.Infof("Getting page: %s", contextPath)
 			data := "# MDWiki\n\nThis is base page for MDWiki"
 			w.Header().Set("Content-Type", "text/markdown")
 			w.Write([]byte(data))
 		} else if contextPath == "/config.json" {
-			log.Printf("Getting page: %s", contextPath)
+			cfg.Logger.Infof("Getting page: %s", contextPath)
 			data := "{}"
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(data))
 		} else if contextPath == "/navigation.md" {
-			log.Printf("Getting page: %s", contextPath)
+			cfg.Logger.Infof("Getting page: %s", contextPath)
 			data := "# MDWiki\n\n[gimmick:Theme (inverse: false)](bootstrap)\n[Home](index.md)"
 			w.Header().Set("Content-Type", "text/markdown")
 			w.Write([]byte(data))
 		} else {
-			cfg.ErrorHandler(w, http.StatusNotFound)
+			cfg.ErrorHandler(w, r, http.StatusNotFound)
 			return
 		}
 	})
