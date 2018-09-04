@@ -2,37 +2,41 @@ package deamon
 
 import (
 	"fmt"
+	"github.com/mister87/mdwiki-web-server/logger"
 	"github.com/mister87/mdwiki-web-server/ui"
-	"log"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 type Config struct {
-	Host string
-	Port int
+	Host       string
+	Port       int
+	MDWikiPath string
+	Logger     logger.Config
 }
 
 func (cfg *Config) Run() error {
+	cfg.Logger.Infof("Create listener: %s:%d", cfg.Host, cfg.Port)
 	listenSpec := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	l, err := net.Listen("tcp", listenSpec)
 	if err != nil {
-		log.Printf("Error creating listener: %v\n", err)
+		cfg.Logger.Errorf("Error creating listener: %v", err)
 		return err
 	}
-	log.Printf("Starting, HTTP on: %s\n", l.Addr().String())
-	app := ui.Start(l)
-	waitForSignal(app)
-	return nil
+	app := ui.Config{
+		Listener: l,
+		Logger:   cfg.Logger,
+	}
+	app.Start()
+	return cfg.waitForSignal(app)
 }
 
-func waitForSignal(app *http.Server) {
+func (cfg *Config) waitForSignal(app ui.Config) error {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	s := <-ch
-	log.Printf("Got signal: %v, exiting.\n", s)
-	ui.Stop(app)
+	cfg.Logger.Infof("Got signal: %v, exiting.", s)
+	return app.Stop()
 }

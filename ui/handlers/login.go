@@ -7,11 +7,11 @@ import (
 	"strconv"
 )
 
-func Login() http.Handler {
-	return http.HandlerFunc(loginHandler)
+func (cfg *Config) Login() http.Handler {
+	return http.HandlerFunc(cfg.loginHandler)
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
+func (cfg *Config) loginHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Getting page: %s", r.URL.Path)
 	//isAuth, _ := r.Cookie("is_auth")
 	//if isAuth.Value == "true" {

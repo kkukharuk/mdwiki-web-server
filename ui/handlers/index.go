@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-func Index() http.Handler {
-	return http.HandlerFunc(indexHandler)
+func (cfg *Config) Index() http.Handler {
+	return http.HandlerFunc(cfg.indexHandler)
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func (cfg *Config) indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Getting page: %s", r.URL.Path)
 	isAuth, err := r.Cookie("is_auth")
 	if err != nil {
@@ -32,7 +32,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Other() http.Handler {
+func (cfg *Config) Other() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		contextPath := r.URL.Path
 		if contextPath == "/" {
@@ -54,7 +54,7 @@ func Other() http.Handler {
 			w.Header().Set("Content-Type", "text/markdown")
 			w.Write([]byte(data))
 		} else {
-			ErrorHandler(w, http.StatusNotFound)
+			cfg.ErrorHandler(w, http.StatusNotFound)
 			return
 		}
 	})

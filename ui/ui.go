@@ -1,43 +1,63 @@
 package ui
 
 import (
+	"github.com/mister87/mdwiki-web-server/logger"
 	"github.com/mister87/mdwiki-web-server/ui/handlers"
 	"github.com/mister87/mdwiki-web-server/ui/static/css"
 	"github.com/mister87/mdwiki-web-server/ui/static/js"
-	"log"
 	"net"
 	"net/http"
 	"time"
 )
 
-func Start(listener net.Listener) *http.Server {
+type Config struct {
+	Listener net.Listener
+	Logger   logger.Config
+	UI       *http.Server
+}
+
+func (cfg *Config) Start() {
+	cfg.Logger.Debugf("Configuring HTTP server on: %s", cfg.Listener.Addr().String())
 	server := &http.Server{
-		Addr:           listener.Addr().String(),
+		Addr:           cfg.Listener.Addr().String(),
 		ReadTimeout:    60 * time.Second,
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 16,
 	}
-
+	cfg.UI = server
+	cfg.Logger.Debug("Prepare HTTP server handlers")
+	handlersCfg := handlers.Config{
+		Logger: cfg.Logger,
+	}
 	// Pages
-	http.Handle("/", handlers.Other())
-	http.Handle("/ui", handlers.Index())
-	http.Handle("/login", handlers.Login())
+	http.Handle("/", handlersCfg.Other())
+	http.Handle("/ui", handlersCfg.Index())
+	http.Handle("/login", handlersCfg.Login())
 	// Static Handles
-	http.HandleFunc("/static/css/bootstrap.min.css", css.BootstrapMinCSS)
-	http.HandleFunc("/static/css/ie10-viewport-bug-workaround.css", css.IE10ViewportBugWorkaroundCSS)
-	http.HandleFunc("/static/css/signin.css", css.SigninCSS)
-	http.HandleFunc("/static/css/theme.css", css.ThemeCSS)
-	http.HandleFunc("/static/js/html5shiv.min.js", js.Html5shivMinJS)
-	http.HandleFunc("/static/js/ie8-responsive-file-warning.js", js.IE8ResponsiveFileWarningJS)
-	http.HandleFunc("/static/js/ie10-viewport-bug-workaround.js", js.IE10ViewportBugWorkaroundJS)
-	http.HandleFunc("/static/js/ie-emulation-modes-warning.js", js.IEEmulationModesWarningJS)
-	http.HandleFunc("/static/js/respond.min.js", js.RespondMinJS)
-	go server.Serve(listener)
-	return server
+	cssConfig := css.Config{
+		Logger: cfg.Logger,
+	}
+	http.HandleFunc("/static/css/bootstrap.min.css", cssConfig.BootstrapMinCSS)
+	http.HandleFunc("/static/css/ie10-viewport-bug-workaround.css", cssConfig.IE10ViewportBugWorkaroundCSS)
+	http.HandleFunc("/static/css/signin.css", cssConfig.SigninCSS)
+	http.HandleFunc("/static/css/theme.css", cssConfig.ThemeCSS)
+	jsConfig := js.Config{
+		Logger: cfg.Logger,
+	}
+	http.HandleFunc("/static/js/html5shiv.min.js", jsConfig.Html5shivMinJS)
+	http.HandleFunc("/static/js/ie8-responsive-file-warning.js", jsConfig.IE8ResponsiveFileWarningJS)
+	http.HandleFunc("/static/js/ie10-viewport-bug-workaround.js", jsConfig.IE10ViewportBugWorkaroundJS)
+	http.HandleFunc("/static/js/ie-emulation-modes-warning.js", jsConfig.IEEmulationModesWarningJS)
+	http.HandleFunc("/static/js/respond.min.js", jsConfig.RespondMinJS)
+	cfg.Logger.Debugf("Starting, HTTP server on: %s", cfg.Listener.Addr().String())
+	go server.Serve(cfg.Listener)
 }
 
-func Stop(app *http.Server) error {
-	err := app.Shutdown(nil)
-	log.Printf("Stopping, HTTP on: %s\n", app.Addr)
+func (cfg *Config) Stop() error {
+	cfg.Logger.Debugf("Stopping, HTTP server on: %s", cfg.UI.Addr)
+	err := cfg.UI.Shutdown(nil)
+	if err != nil {
+		cfg.Logger.Errorf("Error stoping HTTP server: %v", err)
+	}
 	return err
 }
