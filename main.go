@@ -8,11 +8,12 @@ import (
 
 var app deamon.Config
 var logSize int
+var mdPath string
 
 func init() {
 	flag.StringVar(&app.Host, "h", "", "HTTP host")
 	flag.IntVar(&app.Port, "p", 3000, "HTTP port")
-	flag.StringVar(&app.MDWikiPath, "wiki", "", "Markdown files path")
+	flag.StringVar(&mdPath, "wiki", ".", "Markdown files path")
 	flag.StringVar(&app.Logger.LogFileName, "log", "mdwiki-web-server.log", "Log file path")
 	flag.StringVar(&app.Logger.LogLevel, "log-level", "DEBUG", "Log level: DEBUG, ERROR, WARN, INFO")
 	flag.StringVar(&app.Logger.RotateConfig.RuleType, "log-rotate-type", "SIZE", "Log rotate type: SIZE, DATE")
@@ -22,8 +23,6 @@ func init() {
 	flag.BoolVar(&app.Logger.Output, "log-output", false, "Output log data")
 	flag.Parse()
 	app.Logger.RotateConfig.LogSize = int64(logSize)
-	if app.MDWikiPath == "" {
-	}
 	err := app.Logger.Init()
 	if err != nil {
 		log.Fatalf("[ERROR] %v", err)
@@ -31,7 +30,7 @@ func init() {
 }
 
 func main() {
-	if err := app.Run(); err != nil {
+	if err := app.Run(mdPath); err != nil {
 		app.Logger.Errorf("Error in main(): %v", err)
 	}
 }

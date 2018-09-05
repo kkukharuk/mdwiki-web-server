@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"encoding/base64"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 func (cfg *Config) Index() http.Handler {
@@ -34,27 +37,44 @@ func (cfg *Config) indexHandler(w http.ResponseWriter, r *http.Request) {
 func (cfg *Config) Other() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		contextPath := r.URL.Path
+		cfg.Logger.Infof("Getting page: %s", contextPath)
 		if contextPath == "/" {
-			cfg.Logger.Infof("Getting page: %s", contextPath)
 			http.Redirect(w, r, "/ui", http.StatusMovedPermanently)
-		} else if contextPath == "/index.md" {
-			cfg.Logger.Infof("Getting page: %s", contextPath)
-			data := "# MDWiki\n\nThis is base page for MDWiki"
-			w.Header().Set("Content-Type", "text/markdown")
-			w.Write([]byte(data))
-		} else if contextPath == "/config.json" {
-			cfg.Logger.Infof("Getting page: %s", contextPath)
-			data := "{}"
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(data))
-		} else if contextPath == "/navigation.md" {
-			cfg.Logger.Infof("Getting page: %s", contextPath)
-			data := "# MDWiki\n\n[gimmick:Theme (inverse: false)](bootstrap)\n[Home](index.md)"
-			w.Header().Set("Content-Type", "text/markdown")
-			w.Write([]byte(data))
+		} else if contextPath[len(contextPath)-3:] == ".md" || contextPath[len(contextPath)-5:] == ".json" {
+			data, contentType := cfg.getMarkdownFile(contextPath)
+			w.Header().Set("Content-Type", contentType)
+			w.Write(data)
+			return
 		} else {
 			cfg.ErrorHandler(w, r, http.StatusNotFound)
 			return
 		}
 	})
+}
+
+func (cfg *Config) getMarkdownFile(contextPath string) ([]byte, string) {
+	var data []byte
+	var contentType string
+	var err error
+	if data, err = ioutil.ReadFile(fmt.Sprintf("%s%s", cfg.MDWikiPath, contextPath)); os.IsNotExist(err) {
+		cfg.Logger.Warnf("Error %v", err)
+		if contextPath == "/index.md" {
+			data = []byte("# MDWiki\n\nThis is base page for MDWiki")
+			contentType = "text/markdown"
+		} else if contextPath == "/navigation.md" {
+			data = []byte("# MDWiki\n\n[gimmick:Theme (inverse: false)](bootstrap)\n[Home](index.md)")
+			contentType = "text/markdown"
+		} else if contextPath == "/config.json" {
+			data = []byte("{}")
+			contentType = "application/json"
+		} else {
+			data = []byte("# Page not fount")
+			contentType = "text/markdown"
+		}
+	} else {
+		if contextPath[len(contextPath)-4:len(contextPath)-1] == ".md" {
+			contentType = "text/markdown"
+		}
+	}
+	return data, contentType
 }

@@ -11,13 +11,12 @@ import (
 )
 
 type Config struct {
-	Host       string
-	Port       int
-	MDWikiPath string
-	Logger     logger.Config
+	Host   string
+	Port   int
+	Logger logger.Config
 }
 
-func (cfg *Config) Run() error {
+func (cfg *Config) Run(mdPath string) error {
 	cfg.Logger.Infof("Create listener: %s:%d", cfg.Host, cfg.Port)
 	listenSpec := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	l, err := net.Listen("tcp", listenSpec)
@@ -29,7 +28,7 @@ func (cfg *Config) Run() error {
 		Listener: l,
 		Logger:   cfg.Logger,
 	}
-	app.Start()
+	app.Start(mdPath)
 	return cfg.waitForSignal(app)
 }
 
