@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/mister87/mdwiki-web-server/deamon"
 	"log"
 )
@@ -22,7 +21,6 @@ func init() {
 	flag.IntVar(&app.Logger.RotateConfig.MaxFiles, "log-max-files", 5, "Log max log files")
 	flag.BoolVar(&app.Logger.Output, "log-output", false, "Output log data")
 	flag.Parse()
-	fmt.Println(logSize)
 	app.Logger.RotateConfig.LogSize = int64(logSize)
 	if app.MDWikiPath == "" {
 	}
