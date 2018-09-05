@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -12,7 +11,7 @@ func (cfg *Config) Login() http.Handler {
 }
 
 func (cfg *Config) loginHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Getting page: %s", r.URL.Path)
+	cfg.Logger.Infof("Getting page: %s", r.URL.Path)
 	//isAuth, _ := r.Cookie("is_auth")
 	//if isAuth.Value == "true" {
 	//	http.Redirect(w, r, "/ui", http.StatusFound)
