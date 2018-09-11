@@ -11,8 +11,8 @@ var logSize int
 var mdPath string
 
 func init() {
-	flag.StringVar(&app.Host, "h", "", "HTTP host")
-	flag.IntVar(&app.Port, "p", 3000, "HTTP port")
+	flag.StringVar(&app.Host, "host", "", "HTTP host")
+	flag.IntVar(&app.Port, "port", 3000, "HTTP port")
 	flag.StringVar(&mdPath, "wiki", ".", "Markdown files path")
 	flag.StringVar(&app.Logger.LogFileName, "log", "mdwiki-web-server.log", "Log file path")
 	flag.StringVar(&app.Logger.LogLevel, "log-level", "DEBUG", "Log level: DEBUG, ERROR, WARN, INFO")
