@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func (cfg *Config) Index() http.Handler {
@@ -40,7 +41,7 @@ func (cfg *Config) Other() http.Handler {
 		cfg.Logger.Infof("Getting page: %s", contextPath)
 		if contextPath == "/" {
 			http.Redirect(w, r, "/ui", http.StatusMovedPermanently)
-		} else if contextPath[len(contextPath)-3:] == ".md" || contextPath[len(contextPath)-5:] == ".json" || contextPath[len(contextPath)-4:] == ".png" {
+		} else if contextPath[len(contextPath)-3:] == ".md" || contextPath[len(contextPath)-5:] == ".json" || contextPath[len(contextPath)-4:] == ".png" || contextPath[len(contextPath)-4:] == ".jpg" {
 			data, contentType := cfg.getMarkdownFile(contextPath)
 			w.Header().Set("Content-Type", contentType)
 			w.Write(data)
@@ -72,12 +73,15 @@ func (cfg *Config) getMarkdownFile(contextPath string) ([]byte, string) {
 			contentType = "text/markdown"
 		}
 	} else {
-		if contextPath[len(contextPath)-4:len(contextPath)-1] == ".md" {
+		fmt.Println(contextPath, contextPath[len(contextPath)-3:], contextPath[len(contextPath)-5:], contextPath[len(contextPath)-4:])
+		if contextPath[len(contextPath)-3:] == ".md" {
 			contentType = "text/markdown"
-		} else if contextPath[len(contextPath)-5:len(contextPath)-1] == ".png" {
+		} else if strings.Contains(contextPath, "favicon.png") {
 			contentType = "image/x-icon"
-		} else if contextPath[len(contextPath)-6:len(contextPath)-1] == ".json" {
+		} else if contextPath[len(contextPath)-5:] == ".json" {
 			contentType = "application/json"
+		} else if contextPath[len(contextPath)-4:] == ".jpg" {
+			contentType = "image/jpeg"
 		}
 	}
 	return data, contentType
