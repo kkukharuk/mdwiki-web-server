@@ -40,7 +40,7 @@ func (cfg *Config) Other() http.Handler {
 		cfg.Logger.Infof("Getting page: %s", contextPath)
 		if contextPath == "/" {
 			http.Redirect(w, r, "/ui", http.StatusMovedPermanently)
-		} else if contextPath[len(contextPath)-3:] == ".md" || contextPath[len(contextPath)-5:] == ".json" {
+		} else if contextPath[len(contextPath)-3:] == ".md" || contextPath[len(contextPath)-5:] == ".json" || contextPath[len(contextPath)-4:] == ".png" {
 			data, contentType := cfg.getMarkdownFile(contextPath)
 			w.Header().Set("Content-Type", contentType)
 			w.Write(data)
@@ -74,6 +74,10 @@ func (cfg *Config) getMarkdownFile(contextPath string) ([]byte, string) {
 	} else {
 		if contextPath[len(contextPath)-4:len(contextPath)-1] == ".md" {
 			contentType = "text/markdown"
+		} else if contextPath[len(contextPath)-5:len(contextPath)-1] == ".png" {
+			contentType = "image/x-icon"
+		} else if contextPath[len(contextPath)-6:len(contextPath)-1] == ".json" {
+			contentType = "application/json"
 		}
 	}
 	return data, contentType
