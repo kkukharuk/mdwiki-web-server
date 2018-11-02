@@ -1,5 +1,5 @@
 package handlers
 
 func CheckUser(username, password string) bool {
-	return map[string]string{"admin": "admin"}[username] == password
+	return map[string]string{"admin": "Qwer1234"}[username] == password
 }
