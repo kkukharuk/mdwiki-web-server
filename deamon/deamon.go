@@ -14,6 +14,7 @@ type Config struct {
 	Host   string
 	Port   int
 	Logger logger.Config
+	Auth   bool
 }
 
 func (cfg *Config) Run(mdPath string) error {
@@ -29,7 +30,7 @@ func (cfg *Config) Run(mdPath string) error {
 		Listener: l,
 		Logger:   cfg.Logger,
 	}
-	app.Start(mdPath)
+	app.Start(mdPath, cfg.Auth)
 	return cfg.waitForSignal(app)
 }
 

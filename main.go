@@ -21,6 +21,7 @@ func init() {
 	flag.IntVar(&app.Logger.RotateConfig.Day, "log-date", 1, "Log date (Used if log rotate type is 'DATE')")
 	flag.IntVar(&app.Logger.RotateConfig.MaxFiles, "log-max-files", 5, "Log max log files")
 	flag.BoolVar(&app.Logger.Output, "log-output", false, "Output log data")
+	flag.BoolVar(&app.Auth, "auth", false, "Authentication enable")
 	flag.Parse()
 	app.Logger.RotateConfig.LogSize = int64(logSize)
 	err := app.Logger.Init()

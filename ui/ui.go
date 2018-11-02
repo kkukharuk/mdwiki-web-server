@@ -16,7 +16,7 @@ type Config struct {
 	UI       *http.Server
 }
 
-func (cfg *Config) Start(mdPath string) {
+func (cfg *Config) Start(mdPath string, auth bool) {
 	cfg.Logger.Debugf("Configuring HTTP server on: %s", cfg.Listener.Addr().String())
 	server := &http.Server{
 		Addr:           cfg.Listener.Addr().String(),
@@ -29,6 +29,7 @@ func (cfg *Config) Start(mdPath string) {
 	handlersCfg := handlers.Config{
 		MDWikiPath: mdPath,
 		Logger:     cfg.Logger,
+		Auth:       auth,
 	}
 	// Pages
 	http.Handle("/", handlersCfg.Other())

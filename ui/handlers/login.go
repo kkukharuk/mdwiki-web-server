@@ -32,7 +32,7 @@ func (cfg *Config) loginHandler(w http.ResponseWriter, r *http.Request) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="On-line tools service">
         <meta name="author" content="Konstantin Kukharuk (Konstantin@Kukharuk.ru)">
-        <title>On-line TOOLS</title>
+        <title>On-line Web-TOOLS</title>
         <link href="/static/css/bootstrap.min.css" rel="stylesheet">
         <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
         <link href="/static/css/signin.css" rel="stylesheet">
@@ -58,6 +58,20 @@ func (cfg *Config) loginHandler(w http.ResponseWriter, r *http.Request) {
     </body>
 </html>
 `
+	if !cfg.Auth {
+		okCookie := http.Cookie{
+			Name:  "is_auth",
+			Value: "true",
+		}
+		http.SetCookie(w, &okCookie)
+		userCookie := http.Cookie{
+			Name:  "is_user",
+			Value: r.FormValue("username"),
+		}
+		http.SetCookie(w, &userCookie)
+		http.Redirect(w, r, "/ui", http.StatusFound)
+		return
+	}
 	if r.Method == "GET" {
 		failAuth, err := r.Cookie("fail_auth")
 		if err != nil {
